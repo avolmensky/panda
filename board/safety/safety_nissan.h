@@ -107,6 +107,7 @@ static int nissan_tx_hook(CAN_FIFOMailBox_TypeDef *to_send) {
   int tx = 1;
   int addr = GET_ADDR(to_send);
   int bus = GET_BUS(to_send);
+  bool violation = 0;
 
   if (!msg_allowed(addr, bus, NISSAN_TX_MSGS, sizeof(NISSAN_TX_MSGS) / sizeof(NISSAN_TX_MSGS[0]))) {
     tx = 0;
@@ -123,7 +124,6 @@ static int nissan_tx_hook(CAN_FIFOMailBox_TypeDef *to_send) {
 
     // offeset 1310 * NISSAN_DEG_TO_CAN
     desired_angle =  desired_angle - 131000;
-    bool violation = 0;
 
     if (controls_allowed && lka_active) {
       // add 1 to not false trigger the violation
@@ -163,12 +163,20 @@ static int nissan_tx_hook(CAN_FIFOMailBox_TypeDef *to_send) {
     if (!controls_allowed && lka_active) {
       violation = 1;
     }
-
-    if (violation) {
-      controls_allowed = 0;
-      tx = 0;
-    }
   }
+
+  // acc button check, only allow cancel button to be sent
+  if (addr == 0x20b) {
+    // Only allow two bit positions of cancel_button and no_buttons_pressed signals to be set
+    violation |= ((GET_BYTES_04(to_send) | 0x2200) != 0x2200);
+    violation |= (GET_BYTES_48(to_send) > 0);
+  }
+
+  if (violation) {
+    controls_allowed = 0;
+    tx = 0;
+  }
+
   return tx;
 }
 
