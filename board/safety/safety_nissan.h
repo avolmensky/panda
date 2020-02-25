@@ -177,6 +177,10 @@ static int nissan_fwd_hook(int bus_num, CAN_FIFOMailBox_TypeDef *to_fwd) {
   int bus_fwd = -1;
   int addr = GET_ADDR(to_fwd);
 
+  if (bus_num == 0) {
+    bus_fwd = 2;  // ADAS
+  }
+
   if (bus_num == 2) {
     // 0x169 is LKAS
     int block_msg = (addr == 0x169);
