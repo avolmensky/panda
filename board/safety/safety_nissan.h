@@ -20,7 +20,6 @@ const AddrBus NISSAN_TX_MSGS[] = {{0x169, 0}, {0x20b, 2}};
 AddrCheckStruct nissan_rx_checks[] = {
   {.addr = {0x2}, .bus = 0, .expected_timestep = 100000U},
   {.addr = {0x29a}, .bus = 0, .expected_timestep = 50000U},
-  {.addr = {0x20b}, .bus = 0, .expected_timestep = 50000U},
   {.addr = {0x1b6}, .bus = 1, .expected_timestep = 100000U},
 };
 const int NISSAN_RX_CHECK_LEN = sizeof(nissan_rx_checks) / sizeof(nissan_rx_checks[0]);
@@ -90,10 +89,10 @@ static int nissan_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
         nissan_cruise_engaged_last = cruise_engaged;
       }
 
-      // exit controls on rising edge of brake press if speed > 0
+      // exit controls on rising edge of brake press, or if speed > 0 and brake
       if (addr == 0x454) {
         int brake = (GET_BYTE(to_push, 2) & 0x80);
-        if ((brake > 0) && (nissan_brake_prev == 0) && (nissan_speed > 0.)) {
+        if ((brake > 0) && ((nissan_brake_prev == 0) || (nissan_speed > 0.))) {
           controls_allowed = 0;
         }
         nissan_brake_prev = brake;
