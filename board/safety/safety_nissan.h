@@ -168,7 +168,7 @@ static int nissan_tx_hook(CAN_FIFOMailBox_TypeDef *to_send) {
   // acc button check, only allow cancel button to be sent
   if (addr == 0x20b) {
     // Violation of any button other than cancel is pressed
-    violation |= ((GET_BYTE(to_send, 1) | 0x3d) > 0);
+    violation |= ((GET_BYTE(to_send, 1) & 0x3d) > 0);
   }
 
   if (violation) {
