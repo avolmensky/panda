@@ -189,8 +189,8 @@ static int nissan_fwd_hook(int bus_num, CAN_FIFOMailBox_TypeDef *to_fwd) {
   }
 
   if (bus_num == 2) {
-    // 0x169 is LKAS
-    int block_msg = (addr == 0x169);
+    // 0x169 is LKAS, 0x2b1 LKAS_HUD
+    int block_msg = (addr == 0x169 || addr == 0x2b1);
     if (!block_msg) {
       bus_fwd = 0;  // V-CAN
     }
