@@ -36,9 +36,9 @@ else:
     "-g",
   ]
 
-  if not PC:
-    PROJECT_FLAGS += ["-DEON"]
-    BUILDER = "EON"
+  # if not PC:
+  #   PROJECT_FLAGS += ["-DEON"]
+  #   BUILDER = "EON"
 
 
 def get_version(builder, build_type):
